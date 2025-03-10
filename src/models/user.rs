@@ -9,6 +9,7 @@ pub struct User {
     pub email: String,
     pub password_hash: String,
     pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
 }
 
 impl User {
@@ -23,7 +24,7 @@ impl User {
             r#"
                 INSERT INTO users (username, email, password_hash)
                 VALUES ($1, $2, $3)
-                RETURNING id, username, email, password_hash, created_at
+                RETURNING id, username, email, password_hash, created_at, updated_at
             "#,
             username,
             email,
@@ -38,7 +39,7 @@ impl User {
         let user = query_as!(
             User,
             r#"
-                SELECT id, username, email, password_hash, created_at
+                SELECT id, username, email, password_hash, created_at, updated_at
                 FROM users
                 WHERE email = $1
             "#,
