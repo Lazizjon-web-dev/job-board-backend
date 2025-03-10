@@ -21,9 +21,9 @@ pub fn create_token(email: &str) -> String {
     let secret_key = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
 
     encode(
-        &Header::default,
+        &Header::default(),
         &claims,
-        &EncodingKey::from_secret(&secret_key),
+        &EncodingKey::from_secret(secret_key.as_ref()),
     )
     .unwrap()
 }
@@ -32,8 +32,8 @@ pub fn validate_token(token: &str) -> Result<Claims, jsonwebtoken::errors::Error
     let secret_key = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
     decode::<Claims>(
         token,
-        &DecodingKey::from_secret(&secret_key),
-        &Validation::default,
+        &DecodingKey::from_secret(secret_key.as_ref()),
+        &Validation::default(),
     )
     .map(|data| data.claims)
 }
