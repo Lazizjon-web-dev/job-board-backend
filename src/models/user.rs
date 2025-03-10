@@ -40,7 +40,7 @@ impl User {
             r#"
                 SELECT id, username, email, password_hash, created_at
                 FROM users
-                WHERE email = &1
+                WHERE email = $1
             "#,
             email
         )
