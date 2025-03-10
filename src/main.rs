@@ -27,7 +27,7 @@ async fn main() -> std::io::Result<()> {
             )
             .app_data(web::Data::new(pool.clone()))
             .configure(auth::config)
-            // .configure(jobs::config)
+            .configure(jobs::config)
             // .configure(applications::config)
     })
     .bind("127.0.0.1:8000")?
