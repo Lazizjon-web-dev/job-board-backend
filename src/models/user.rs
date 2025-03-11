@@ -1,6 +1,6 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
-use sqlx::{Error, FromRow, PgPool, query_as};
+use sqlx::{Error, FromRow, PgPool, query, query_as};
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct User {
@@ -49,5 +49,18 @@ impl User {
         .await?;
 
         Ok(user)
+    }
+    pub async fn delete(pool: &PgPool, user_id: i32) -> Result<(), Error> {
+        query!(
+            r#"
+                DELETE FROM users
+                WHERE id = $1
+            "#,
+            user_id
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
     }
 }
