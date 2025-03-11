@@ -61,13 +61,28 @@ impl Job {
         Ok(job)
     }
 
+    pub async fn find_by_user_id(pool: &PgPool, user_id: i32) -> Result<Vec<Self>, Error> {
+        let jobs = query_as!(
+            Job,
+            r#"
+                SELECT id, title, description, location, salary, category, employer_id, created_at, updated_at
+                FROM jobs
+                WHERE employer_id = $1
+            "#,
+            user_id
+        )
+        .fetch_all(pool)
+        .await?;
+
+        Ok(jobs)
+    }
+
     pub async fn find_all(pool: &PgPool) -> Result<Vec<Self>, Error> {
         let jobs = query_as!(
             Job,
             r#"
                 SELECT id, title, description, location, salary, category, employer_id, created_at, updated_at
                 FROM jobs
-                ORDER BY updated_at DESC
             "#,
         )
         .fetch_all(pool)
