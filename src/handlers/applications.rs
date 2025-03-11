@@ -28,14 +28,14 @@ pub async fn create_application(
         Err(response) => return response,
     };
 
-    match Application::create(&pool, user.id, form.job_id, &form.message).await {
+    match Application::create(&pool, &user.id, &form.job_id, &form.message).await {
         Ok(application) => HttpResponse::Ok().json(application),
         Err(_) => HttpResponse::InternalServerError().json("Failed to create application"),
     }
 }
 
 pub async fn get_application_by_id(pool: Data<PgPool>, application_id: Path<i32>) -> HttpResponse {
-    match Application::find_by_id(&pool, application_id.into_inner()).await {
+    match Application::find_by_id(&pool, &application_id).await {
         Ok(application) => HttpResponse::Ok().json(application),
         Err(_) => HttpResponse::NotFound().json("Application not found"),
     }
@@ -59,9 +59,17 @@ pub async fn update_application(
         Err(response) => return response,
     };
 
-    //TODO: Add check for whether user has permission to update
+    let application = match Application::find_by_id(&pool, &application_id).await {
+        Ok(application) => application,
+        Err(_) => return HttpResponse::NotFound().json("Application not found"),
+    };
 
-    match Application::update(&pool, application_id.into_inner(), &form.message).await {
+    if application.user_id != user.id {
+        return HttpResponse::Forbidden()
+            .json("You do not have permission to update this application");
+    }
+
+    match Application::update(&pool, &application_id, &form.message).await {
         Ok(application) => HttpResponse::Ok().json(application),
         Err(_) => HttpResponse::InternalServerError().json("Failed to update application"),
     }
@@ -77,9 +85,17 @@ pub async fn delete_application(
         Err(response) => return response,
     };
 
-    //TODO: Add check for whether user has permission to delete
+    let application = match Application::find_by_id(&pool, &application_id).await {
+        Ok(application) => application,
+        Err(_) => return HttpResponse::NotFound().json("Application not found"),
+    };
 
-    match Application::delete(&pool, application_id.into_inner()).await {
+    if application.user_id != user.id {
+        return HttpResponse::Forbidden()
+            .json("You do not have permission to delete this application");
+    }
+
+    match Application::delete(&pool, &application_id).await {
         Ok(_) => HttpResponse::Ok().json("Application deleted"),
         Err(_) => HttpResponse::InternalServerError().json("Failed to delete application"),
     }

@@ -37,7 +37,7 @@ pub async fn create_job(
 
     match Job::create(
         &pool,
-        user.id,
+        &user.id,
         &form.title,
         &form.description,
         &form.location,
@@ -52,7 +52,7 @@ pub async fn create_job(
 }
 
 pub async fn get_job_by_id(pool: Data<PgPool>, job_id: Path<i32>) -> HttpResponse {
-    match Job::find_by_id(&pool, job_id.into_inner()).await {
+    match Job::find_by_id(&pool, &job_id).await {
         Ok(job) => HttpResponse::Ok().json(job),
         Err(_) => HttpResponse::NotFound().json("Job not found"),
     }
@@ -76,11 +76,15 @@ pub async fn update_job(
         Err(response) => return response,
     };
 
-    //TODO: Add check for whether user has permission to update
+    let job = Job::find_by_id(&pool, &job_id).await.unwrap();
+
+    if user.id != job.employer_id {
+        return HttpResponse::Forbidden().json("You do not have permission to update this job");
+    }
 
     match Job::update(
         &pool,
-        job_id.into_inner(),
+        &job_id,
         &form.title,
         &form.description,
         &form.location,
@@ -100,9 +104,13 @@ pub async fn delete_job(pool: Data<PgPool>, job_id: Path<i32>, token: String) ->
         Err(response) => return response,
     };
 
-    //TODO: Add check for whether user has permission to delete the job
+    let job = Job::find_by_id(&pool, &job_id).await.unwrap();
 
-    match Job::delete(&pool, job_id.into_inner()).await {
+    if user.id != job.employer_id {
+        return HttpResponse::Forbidden().json("You do not have permission to delete this job");
+    }
+
+    match Job::delete(&pool, &job_id).await {
         Ok(_) => HttpResponse::Ok().json("Job deleted"),
         Err(_) => HttpResponse::InternalServerError().json("Failed to delete job"),
     }

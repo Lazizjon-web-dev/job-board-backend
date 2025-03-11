@@ -19,6 +19,7 @@ pub struct RegisterRequest {
     pub username: String,
     pub email: String,
     pub password: String,
+    pub role: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -28,7 +29,15 @@ pub struct AuthResponse {
 
 pub async fn register(pool: Data<PgPool>, form: Json<RegisterRequest>) -> HttpResponse {
     let password_hash = hash(&form.password, DEFAULT_COST).unwrap();
-    match User::create(&pool, &form.username, &form.email, &password_hash).await {
+    match User::create(
+        &pool,
+        &form.username,
+        &form.email,
+        &password_hash,
+        &form.role,
+    )
+    .await
+    {
         Ok(user) => {
             let token = create_token(&user.email);
             HttpResponse::Ok().json(AuthResponse { token })
