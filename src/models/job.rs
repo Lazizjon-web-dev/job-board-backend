@@ -18,7 +18,7 @@ pub struct Job {
 impl Job {
     pub async fn create(
         pool: &PgPool,
-        user_id: i32,
+        user_id: &i32,
         title: &str,
         description: &str,
         location: &str,
@@ -45,7 +45,7 @@ impl Job {
         Ok(job)
     }
 
-    pub async fn find_by_id(pool: &PgPool, job_id: i32) -> Result<Self, Error> {
+    pub async fn find_by_id(pool: &PgPool, job_id: &i32) -> Result<Self, Error> {
         let job = query_as!(
             Job,
             r#"
@@ -61,7 +61,7 @@ impl Job {
         Ok(job)
     }
 
-    pub async fn find_by_user_id(pool: &PgPool, user_id: i32) -> Result<Vec<Self>, Error> {
+    pub async fn find_by_user_id(pool: &PgPool, user_id: &i32) -> Result<Vec<Self>, Error> {
         let jobs = query_as!(
             Job,
             r#"
@@ -93,7 +93,7 @@ impl Job {
 
     pub async fn update(
         pool: &PgPool,
-        job_id: i32,
+        job_id: &i32,
         title: &str,
         description: &str,
         location: &str,
@@ -126,7 +126,7 @@ impl Job {
         Ok(job)
     }
 
-    pub async fn delete(pool: &PgPool, job_id: i32) -> Result<(), Error> {
+    pub async fn delete(pool: &PgPool, job_id: &i32) -> Result<(), Error> {
         query!(
             r#"
                 DELETE FROM jobs

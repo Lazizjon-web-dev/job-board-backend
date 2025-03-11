@@ -16,8 +16,8 @@ pub struct Application {
 impl Application {
     pub async fn create(
         pool: &PgPool,
-        user_id: i32,
-        job_id: i32,
+        user_id: &i32,
+        job_id: &i32,
         message: &str,
     ) -> Result<Self, Error> {
         let application = query_as!(
@@ -37,7 +37,7 @@ impl Application {
         Ok(application)
     }
 
-    pub async fn find_by_id(pool: &PgPool, application_id: i32) -> Result<Self, Error> {
+    pub async fn find_by_id(pool: &PgPool, application_id: &i32) -> Result<Self, Error> {
         let application = query_as!(
             Application,
             r#"
@@ -53,7 +53,7 @@ impl Application {
         Ok(application)
     }
 
-    pub async fn find_by_user_id(pool: &PgPool, user_id: i32) -> Result<Vec<Self>, Error> {
+    pub async fn find_by_user_id(pool: &PgPool, user_id: &i32) -> Result<Vec<Self>, Error> {
         let applications = query_as!(
             Application,
             r#"
@@ -85,7 +85,7 @@ impl Application {
 
     pub async fn update_status(
         pool: &PgPool,
-        application_id: i32,
+        application_id: &i32,
         status: &str,
     ) -> Result<Self, Error> {
         let application = query_as!(
@@ -105,11 +105,7 @@ impl Application {
         Ok(application)
     }
 
-    pub async fn update(
-        pool: &PgPool,
-        application_id: i32,
-        message: &str,
-    ) -> Result<Self, Error> {
+    pub async fn update(pool: &PgPool, application_id: &i32, message: &str) -> Result<Self, Error> {
         let application = query_as!(
             Application,
             r#"
@@ -127,7 +123,7 @@ impl Application {
         Ok(application)
     }
 
-    pub async fn delete(pool: &PgPool, application_id: i32) -> Result<(), Error> {
+    pub async fn delete(pool: &PgPool, application_id: &i32) -> Result<(), Error> {
         query!(
             r#"
                 DELETE FROM applications
