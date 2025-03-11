@@ -4,7 +4,7 @@ CREATE TABLE users (
     username TEXT UNIQUE NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
-    -- role TEXT NOT NULL CHECK (role IN ('job_seeker', 'employer')),
+    role TEXT NOT NULL CHECK (role IN ('job_seeker', 'employer')),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

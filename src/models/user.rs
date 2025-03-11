@@ -8,6 +8,7 @@ pub struct User {
     pub username: String,
     pub email: String,
     pub password_hash: String,
+    pub role: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
@@ -18,17 +19,19 @@ impl User {
         username: &str,
         email: &str,
         password_hash: &str,
+        role: &str,
     ) -> Result<Self, Error> {
         let user = query_as!(
             User,
             r#"
-                INSERT INTO users (username, email, password_hash)
-                VALUES ($1, $2, $3)
-                RETURNING id, username, email, password_hash, created_at, updated_at
+                INSERT INTO users (username, email, password_hash, role)
+                VALUES ($1, $2, $3, $4)
+                RETURNING id, username, email, password_hash, role, created_at, updated_at
             "#,
             username,
             email,
-            password_hash
+            password_hash,
+            role
         )
         .fetch_one(pool)
         .await?;
@@ -39,7 +42,7 @@ impl User {
         let user = query_as!(
             User,
             r#"
-                SELECT id, username, email, password_hash, created_at, updated_at
+                SELECT id, username, email, password_hash, role,  created_at, updated_at
                 FROM users
                 WHERE email = $1
             "#,
