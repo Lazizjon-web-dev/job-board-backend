@@ -27,6 +27,7 @@ async fn main() -> std::io::Result<()> {
             )
             .app_data(web::Data::new(pool.clone()))
             .configure(auth::config)
+            .configure(users::config)
             .configure(jobs::config)
             .configure(applications::config)
     })

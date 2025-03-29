@@ -53,6 +53,21 @@ impl User {
 
         Ok(user)
     }
+    pub async fn find_by_id(pool: &PgPool, user_id: &i32) -> Result<Self, Error> {
+        let user = query_as!(
+            User,
+            r#"
+                SELECT id, username, email, password_hash, role, created_at, updated_at
+                FROM users
+                WHERE id = $1
+            "#,
+            user_id
+        )
+        .fetch_one(pool)
+        .await?;
+
+        Ok(user)
+    }
     pub async fn delete(pool: &PgPool, user_id: i32) -> Result<(), Error> {
         query!(
             r#"
